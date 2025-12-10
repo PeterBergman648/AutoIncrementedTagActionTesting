@@ -20,11 +20,11 @@ jobs:
         shell: bash
         run: |
           BRANCHNAME=${{ github.ref_name }}
-          echo 'Got branch name: ${BRANCHNAME}'
-          BUILDSUFFIX=$(git tag -l '${BRANCHNAME}.*' | awk -F. '{print $NF}' | sort -n - | tail -n 1)
-          echo 'Latest build suffix: ${BUILDSUFFIX}'
+          echo "Got branch name: ${BRANCHNAME}"
+          BUILDSUFFIX=$(git tag -l "${BRANCHNAME}.*" | awk -F. '{print $NF}' | sort -n - | tail -n 1)
+          echo "Latest build suffix: ${BUILDSUFFIX}"
           NEWBUILDSUFFIX=$((${BUILDSUFFIX:--1} + 1))
-          echo 'New build suffix: ${NEWBUILDSUFFIX}'
+          echo "New build suffix: ${NEWBUILDSUFFIX}"
           NEWTAG="${BRANCHNAME}.${NEWBUILDSUFFIX}"
           echo "Creating new tag: ${NEWTAG}"
           git tag -a "${NEWTAG}" -m "Auto-incremented tag"
