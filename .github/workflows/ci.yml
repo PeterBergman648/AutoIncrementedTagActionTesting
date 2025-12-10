@@ -1,0 +1,28 @@
+name: AutoIncrementTag
+
+on:
+  push:
+    # branches: [ main ]
+  workflow_dispatch:
+  # pull_request:
+  #   branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Extract latest tag number
+        shell: bash
+        run: |
+          BRANCHNAME=${{ github.ref_name }}
+          BUILDSUFFIX=$(git tag -l '${BRANCHNAME}.*' | awk -F. '{print $NF}' | sort -n - | tail -n 1)
+          NEWBUILDSUFFIX=$((${BUILDSUFFIX:--1} + 1))
+          NEWTAG="${BRANCHNAME}.${NEWBUILDSUFFIX}"
+          git tag -a "${NEWTAG}" -m "Auto-incremented tag"
+          git push origin tag "${NEWTAG}"
+          echo "Latest tag for branch ${BRANCHNAME} is: ${NEWTAG}"
