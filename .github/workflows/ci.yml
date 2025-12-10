@@ -20,9 +20,18 @@ jobs:
         shell: bash
         run: |
           BRANCHNAME=${{ github.ref_name }}
+          echo 'Got branch name: ${BRANCHNAME}'
           BUILDSUFFIX=$(git tag -l '${BRANCHNAME}.*' | awk -F. '{print $NF}' | sort -n - | tail -n 1)
+          echo 'Latest build suffix: ${BUILDSUFFIX}'
           NEWBUILDSUFFIX=$((${BUILDSUFFIX:--1} + 1))
+          echo 'New build suffix: ${NEWBUILDSUFFIX}'
           NEWTAG="${BRANCHNAME}.${NEWBUILDSUFFIX}"
+          echo "Creating new tag: ${NEWTAG}"
           git tag -a "${NEWTAG}" -m "Auto-incremented tag"
+          echo "Pushing tag ${NEWTAG} to origin"
           git push origin tag "${NEWTAG}"
-          echo "Latest tag for branch ${BRANCHNAME} is: ${NEWTAG}"
+          if [ $? -ne 0 ]; then
+            echo "Failed to push tag ${NEWTAG}"
+            exit 1
+          fi
+          echo "New tag ${NEWTAG} created and pushed successfully."
